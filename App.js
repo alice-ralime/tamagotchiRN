@@ -2,7 +2,34 @@ import { StatusBar } from 'expo-status-bar';
 import { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground, Vibration} from 'react-native';
 
+
+const digiEgg = [
+  {
+    id:1, nome:"botamon" //koromon - agumon
+  },
+  {
+    id:2, nome:"cocomon" //chocomon - lopmon
+  },
+  {
+    id:3, nome:"zerimon" //terriermon
+  },
+  {
+    id:4, nome:"punimon" //tunomon - gabumon
+  },
+  {
+    id:5, nome:"Yukimibotamon" //nyaromon - salamon
+  },
+  {
+    id:6, nome:"Pururumon" // poromon - hawkmon
+  },
+  {
+    id:7, nome:"Chicomon" //chibimon - veemon
+  }
+];
+
+
 export default function App() {
+  const[ovoEscolhido, setOvoEscolhido] = useState(null);
   const [fome, setFome] = useState(50);
   const [felicidade, setFelicidade] = useState(50);
   const [mensagem, setMensagem] = useState('');
@@ -17,6 +44,7 @@ export default function App() {
     return () => clearInterval(relogio);
   }, []);
 
+
   return (
 
     <ImageBackground 
@@ -26,6 +54,21 @@ export default function App() {
     >
       <StatusBar style="auto" />
 
+
+<View style={{ gap: 10, marginTop: 20 }}>
+{digiEgg.map((eggAtual) => (
+  <TouchableOpacity
+    key = {eggAtual.id}
+    style = {styles.botao}
+    onPress={() => {
+      setOvoEscolhido(eggAtual.nome);
+    }}
+  >
+  <Text style={styles.textoBotao}>{eggAtual.nome}</Text>
+  </TouchableOpacity>
+
+))}
+</View>
 
         <Text style={styles.titulo}>"oi alices"</Text>
         <Text style={styles.status}>Fome: {fome}</Text>
