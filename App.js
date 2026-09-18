@@ -5,44 +5,80 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground, Vibra
 
 const digiEgg = [
   {
-    id:1, nome:"botamon" //koromon - agumon
+    id:1, nome:"botamon",  imagem: require('./assets/botamon.png') //koromon - agumon
   },
   {
-    id:2, nome:"cocomon" //chocomon - lopmon
+    id:2, nome:"cocomon", imagem: require('./assets/cocomon.png') //chocomon - lopmon
   },
   {
-    id:3, nome:"zerimon" //terriermon
+    id:3, nome:"zerimon", imagem: require('./assets/zerimon.png') //terriermon
   },
   {
-    id:4, nome:"punimon" //tunomon - gabumon
+    id:4, nome:"punimon", imagem: require('./assets/punimon.png') //tunomon - gabumon
   },
   {
-    id:5, nome:"Yukimibotamon" //nyaromon - salamon
+    id:5, nome:"Yukimibotamon", imagem: require('./assets/yukimibotamon.png') //nyaromon - salamon
   },
   {
-    id:6, nome:"Pururumon" // poromon - hawkmon
+    id:6, nome:"Pururumon", imagem: require('./assets/pururumon.png') // poromon - hawkmon
   },
   {
-    id:7, nome:"Chicomon" //chibimon - veemon
+    id:7, nome:"Chicomon", imagem: require('./assets/chicomon.png') //chibimon - veemon
   }
 ];
 
 
 export default function App() {
+
   const[ovoEscolhido, setOvoEscolhido] = useState(null);
+
   const [fome, setFome] = useState(50);
+
   const [felicidade, setFelicidade] = useState(50);
+
+  const [energia, setEnergia] = useState(50);
+
+  const [dormindo, setDormindo] = useState(false);
+
+  const [nivel, setNivel] = useState(0);
+
   const [mensagem, setMensagem] = useState('');
+
   const timerMensagem = useRef(null); // Ref para armazenar o ID do timer para as mensagens não sumirem antes do tempo!
+
+
 
   useEffect(() => {
     const relogio = setInterval(() => {
       setFome(fomeAtual => Math.max(fomeAtual - 1, 0));
       setFelicidade(felicidadeAtual => Math.max(felicidadeAtual - 1, 0));
-    }, 1000);
+
+      if (dormindo === true) {
+        setEnergia(energiaAtual => Math.min(energiaAtual +5, 100));
+        setFome(fomeAtual => Math.max(fomeAtual - 2, 0));
+      }
+
+    }, 3000);
     
     return () => clearInterval(relogio);
-  }, []);
+  }, [dormindo]);
+
+
+  useEffect(() => {
+    if (dormindo === true && fome === 0) {
+      setDormindo(false);
+    }
+
+  },  [dormindo, fome]);
+
+
+  useEffect(() => {
+    if (energia === 100) {
+      setDormindo(false);
+    }
+
+  },  [energia]);
+
 
 
   return (
@@ -55,36 +91,46 @@ export default function App() {
       <StatusBar style="auto" />
 
 
-<View style={{ gap: 10, marginTop: 20 }}>
-{digiEgg.map((eggAtual) => (
-  <TouchableOpacity
-    key = {eggAtual.id}
-    style = {styles.botao}
-    onPress={() => {
-      setOvoEscolhido(eggAtual.nome);
-    }}
-  >
-  <Text style={styles.textoBotao}>{eggAtual.nome}</Text>
-  </TouchableOpacity>
 
-))}
+
+{ovoEscolhido === null &&(
+<View style={{ gap: 10, marginTop: 20, alignItems: 'center' }}>
+
+  <texto style={styles.titulo}>Escolha um novo companheiro!</texto>
+
+  {digiEgg.map((eggAtual) => (
+    <TouchableOpacity
+      key = {eggAtual.id}
+      style = {styles.botao}
+      onPress={() => {
+        setOvoEscolhido(eggAtual);
+      }}
+    >
+    <Text style={styles.textoBotao}>{eggAtual.nome}</Text>
+    </TouchableOpacity>
+  ))}
 </View>
+)}
 
+{ovoEscolhido !== null &&(
+  <>
         <Text style={styles.titulo}>"oi alices"</Text>
         <Text style={styles.status}>Fome: {fome}</Text>
         <Text style={styles.status}>Felicidade: {felicidade}</Text>
-
+        <Text style={styles.status}>Energia: {energia}</Text>
+        <Text style={styles.status}>Nível: {nivel}</Text>
 
     <Text style={{ fontSize: 20, color: 'blue', fontWeight: 'bold', height: 30 }}>
       {mensagem}
     </Text>
 
         <Image 
-          source={require('./assets/nyaromon.png')}
+          source={ovoEscolhido?.imagem}
           style={{ width: 200, height: 200, marginTop: 50 }}
         />
 
           <View style={styles.areaBotao}>
+
             <TouchableOpacity
               style={styles.botao}
               onPress={() => {
@@ -107,8 +153,11 @@ export default function App() {
 
             <TouchableOpacity
               style={styles.botao}
+              
               onPress={() => {
                 setFelicidade(Math.min(felicidade + 10, 100));
+                setFome(Math.max(fome - 3, 0));
+                setEnergia(Math.max(energia - 5, 0));
                 setMensagem('yayyy!');
                 Vibration.vibrate(100);
 
@@ -123,13 +172,58 @@ export default function App() {
               }}
             >
               
-              <Text style={styles.textoBotao}>Brincar</Text>
+            <Text style={styles.textoBotao}>Brincar</Text>
             </TouchableOpacity>
-          </View>
 
-    </ImageBackground>
-  );
+
+            <TouchableOpacity
+              style={styles.botao}
+              
+              onPress={() => {
+                setDormindo(true);
+                setMensagem('zzzzzzz!');
+                Vibration.vibrate(100);
+
+                if (timerMensagem.current) {
+                clearTimeout(timerMensagem.current);
+              }
+
+              timerMensagem.current = setTimeout(() => {
+              setMensagem('');
+              }, 2000);
+                  
+              }}
+            >
+              
+            <Text style={styles.textoBotao}>Dormir</Text>
+            </TouchableOpacity>
+
+
+            <TouchableOpacity
+              style={styles.botao}
+              
+              onPress={() => {
+                setOvoEscolhido(null);
+                Vibration.vibrate(100);
+
+              timerMensagem.current = setTimeout(() => {
+              setMensagem('');
+              }, 2000);
+                  
+              }}
+            >
+            <Text style={styles.textoBotao}>DigiEggs</Text>
+            </TouchableOpacity>
+
+            
+          </View>
+  </>
+
+  )};
+</ImageBackground>
+);
 }
+
 
 
 const styles = StyleSheet.create({
